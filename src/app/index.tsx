@@ -11,6 +11,7 @@ import {
   Spacing,
 } from "@/constants/theme";
 
+import { ProgressCircle } from "@/components/progress-circle";
 import { Flame } from "lucide-react-native";
 
 export default function HomeScreen() {
@@ -42,6 +43,7 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedView style={content.container}>
+          <ProgressCircle progress={0.25} />
           <ThemedView style={content.wrapper}>
             <ThemedText type="defaultBold">Você está indo bem!</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
@@ -103,12 +105,14 @@ const header = StyleSheet.create({
 
 const content = StyleSheet.create({
   container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: Colors.light.backgroundElement,
-    padding: Spacing.two,
+    padding: Spacing.four,
     borderRadius: Spacing.four,
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    gap: Spacing.two,
+    gap: Spacing.four,
+    marginTop: Spacing.three,
     width: "100%",
   },
   wrapper: {
