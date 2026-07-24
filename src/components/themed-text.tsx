@@ -1,28 +1,37 @@
-import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
+import { StyleSheet, Text, type TextProps } from "react-native";
 
-import { Fonts, ThemeColor } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Fonts, ThemeColor } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle' | 'link' | 'linkPrimary' | 'code';
+  type?:
+    | "default"
+    | "defaultBold"
+    | "title"
+    | "small"
+    | "smallBold"
+    | "subtitle";
   themeColor?: ThemeColor;
 };
 
-export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
+export function ThemedText({
+  style,
+  type = "default",
+  themeColor,
+  ...rest
+}: ThemedTextProps) {
   const theme = useTheme();
 
   return (
     <Text
       style={[
-        { color: theme[themeColor ?? 'text'] },
-        type === 'default' && styles.default,
-        type === 'title' && styles.title,
-        type === 'small' && styles.small,
-        type === 'smallBold' && styles.smallBold,
-        type === 'subtitle' && styles.subtitle,
-        type === 'link' && styles.link,
-        type === 'linkPrimary' && styles.linkPrimary,
-        type === 'code' && styles.code,
+        { color: theme[themeColor ?? "text"], fontFamily: Fonts.sans.regular },
+        type === "default" && styles.default,
+        type === "defaultBold" && styles.defaultBold,
+        type === "title" && styles.title,
+        type === "small" && styles.small,
+        type === "smallBold" && styles.smallBold,
+        type === "subtitle" && styles.subtitle,
         style,
       ]}
       {...rest}
@@ -32,42 +41,40 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
 
 const styles = StyleSheet.create({
   small: {
+    fontFamily: Fonts.sans.regular,
     fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 500,
+    lineHeight: 22,
+    // Quicksand overhangs the measured box — without this the last glyph clips
+    paddingRight: 2,
   },
   smallBold: {
+    fontFamily: Fonts.sans.bold,
     fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 700,
+    lineHeight: 22,
+    paddingRight: 2,
   },
   default: {
-    fontSize: 16,
+    fontFamily: Fonts.sans.medium,
+    fontSize: 15,
     lineHeight: 24,
-    fontWeight: 500,
+    paddingRight: 2,
+  },
+  defaultBold: {
+    fontFamily: Fonts.sans.bold,
+    fontSize: 15,
+    lineHeight: 24,
+    paddingRight: 2,
   },
   title: {
-    fontSize: 48,
-    fontWeight: 600,
-    lineHeight: 52,
+    fontFamily: Fonts.sans.bold,
+    fontSize: 28,
+    lineHeight: 36,
+    paddingRight: 2,
   },
   subtitle: {
-    fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 14,
-  },
-  linkPrimary: {
-    lineHeight: 30,
-    fontSize: 14,
-    color: '#3c87f7',
-  },
-  code: {
-    fontFamily: Fonts.mono,
-    fontWeight: Platform.select({ android: 700 }) ?? 500,
-    fontSize: 12,
+    fontFamily: Fonts.sans.semibold,
+    fontSize: 20,
+    lineHeight: 28,
+    paddingRight: 2,
   },
 });
