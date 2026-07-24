@@ -12,9 +12,77 @@ import {
 } from "@/constants/theme";
 
 import { ProgressCircle } from "@/components/progress-circle";
-import { Flame } from "lucide-react-native";
+import { Book, Brain, Check, Flame } from "lucide-react-native";
+import { useEffect, useState } from "react";
+
+interface Habit {
+  id: number;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  backgroundColor: string;
+  completed: boolean;
+}
 
 export default function HomeScreen() {
+  const initialListHabits: Habit[] = [
+    {
+      id: 3,
+      name: "Ler um livro",
+      description: "10 páginas por dia · 5 dias seguidos",
+      icon: <Book size={16} color={Colors.light.background} strokeWidth={3} />,
+      backgroundColor: Colors.light.danger,
+      completed: false,
+    },
+    {
+      id: 4,
+      name: "Meditar",
+      description: "10 minutos por dia · 5 dias seguidos",
+      icon: <Brain size={16} color={Colors.light.background} strokeWidth={3} />,
+      backgroundColor: Colors.light.tertiary,
+      completed: false,
+    },
+  ];
+
+  const [listHabits, setListHabits] = useState<Habit[]>(initialListHabits);
+  const [habitsCompleted, setHabitsCompleted] = useState<number>(0);
+  const [habitsTotal, setHabitsTotal] = useState<number>(
+    initialListHabits.length,
+  );
+  const [habitsProgress, setHabitsProgress] = useState<number>(0);
+
+  useEffect(() => {
+    setHabitsProgress(habitsCompleted / habitsTotal);
+  }, [habitsCompleted, habitsTotal]);
+
+  useEffect(() => {
+    setHabitsTotal(listHabits.length);
+  }, [listHabits]);
+
+  useEffect(() => {
+    setHabitsCompleted(listHabits.filter((habit) => habit.completed).length);
+  }, [listHabits]);
+
+  function handleCompleteHabit(habitId: number) {
+    setListHabits(
+      listHabits.map((habit) =>
+        habit.id === habitId ? { ...habit, completed: true } : habit,
+      ),
+    );
+    setHabitsCompleted(listHabits.filter((habit) => habit.completed).length);
+    setHabitsProgress(habitsCompleted / habitsTotal);
+  }
+
+  function handleUncompleteHabit(habitId: number) {
+    setListHabits(
+      listHabits.map((habit) =>
+        habit.id === habitId ? { ...habit, completed: false } : habit,
+      ),
+    );
+    setHabitsCompleted(listHabits.filter((habit) => habit.completed).length);
+    setHabitsProgress(habitsCompleted / habitsTotal);
+  }
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -43,13 +111,59 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedView style={content.container}>
-          <ProgressCircle progress={0.25} />
+          <ProgressCircle progress={habitsProgress} />
           <ThemedView style={content.wrapper}>
             <ThemedText type="defaultBold">Você está indo bem!</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              1 de 4 hábitos concluídos
+              {habitsCompleted} de {habitsTotal} hábitos concluídos
             </ThemedText>
           </ThemedView>
+        </ThemedView>
+
+        <ThemedText type="defaultBold" style={content.title}>
+          Seus hábitos
+        </ThemedText>
+
+        <ThemedView style={habitsStyles.container}>
+          {listHabits.map((habit) => (
+            <ThemedView style={habitsStyles.item} key={habit.id.toString()}>
+              <ThemedView
+                style={[
+                  habitsStyles.itemIcon,
+                  { backgroundColor: habit.backgroundColor },
+                ]}
+              >
+                {habit.icon}
+              </ThemedView>
+
+              <ThemedView style={habitsStyles.itemContent}>
+                <ThemedText type="defaultBold">{habit.name}</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  {habit.description}
+                </ThemedText>
+              </ThemedView>
+
+              <ThemedView
+                onTouchStart={() =>
+                  habit.completed
+                    ? handleUncompleteHabit(habit.id)
+                    : handleCompleteHabit(habit.id)
+                }
+                style={[
+                  habitsStyles.check,
+                  habit.completed && habitsStyles.checkCompleted,
+                ]}
+              >
+                {habit.completed && (
+                  <Check
+                    size={14}
+                    color={Colors.light.background}
+                    strokeWidth={3}
+                  />
+                )}
+              </ThemedView>
+            </ThemedView>
+          ))}
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
@@ -116,9 +230,53 @@ const content = StyleSheet.create({
     width: "100%",
   },
   wrapper: {
+    flex: 1,
     alignItems: "flex-start",
     justifyContent: "flex-start",
+    backgroundColor: "transparent",
+  },
+  title: {
+    marginTop: Spacing.three,
+  },
+});
+
+const habitsStyles = StyleSheet.create({
+  container: {
     width: "100%",
+    gap: Spacing.three,
+  },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: Colors.light.backgroundElement,
+    padding: Spacing.three,
+    borderRadius: Spacing.four,
+    gap: Spacing.three,
+  },
+  itemContent: {
+    flex: 1,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    backgroundColor: "transparent",
+  },
+  itemIcon: {
+    padding: Spacing.two,
+    borderRadius: Spacing.four,
+  },
+  check: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: Colors.light.border,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
+
+  checkCompleted: {
+    backgroundColor: Colors.light.primary,
+    borderColor: Colors.light.primary,
   },
 });
